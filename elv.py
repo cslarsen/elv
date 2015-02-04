@@ -69,6 +69,7 @@ class Transaction:
     """Represents one transaction in a bank statement."""
 
     def __init__(self, index, xfer, posted, message, amount, total, alias=None):
+        self.index = index
         self.xfer = xfer
         self.posted = posted
         self.message = message
@@ -105,15 +106,25 @@ class Transactions:
 
     def __repr__(self):
         return "<Transactions:%d items from %s to %s>" % (
-            len(self),
-            min(self.trans).xfer,
-            max(self.trans).xfer)
+            len(self), self.start(), self.stop())
+
+    @property
+    def first(self):
+        """Returns earliest Transaction."""
+        return min(self.trans, key=lambda x: x.xfer)
+
+    @property
+    def last(self):
+        """Returns latest Transaction."""
+        return max(self.trans, key=lambda x: x.xfer)
 
     def start(self):
-        return min(self.trans, key=lambda x: x.xfer).xfer
+        """Returns start date."""
+        return self.first.xfer
 
     def stop(self):
-        return max(self.trans, key=lambda x: x.xfer).xfer
+        """Returns stop date."""
+        return self.last.xfer
 
     def __len__(self):
         return len(self.trans)

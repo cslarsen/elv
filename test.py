@@ -8,4 +8,4 @@ if __name__ == "__main__":
         print("Usage: test.py file.csv")
     else:
         trans = elv.parse(sys.argv[1])
-        print(trans)
+        print(repr(trans))
