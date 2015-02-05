@@ -68,21 +68,19 @@ class Parse:
 class Transaction:
     """Represents one transaction in a bank statement."""
 
-    def __init__(self, index, xfer, posted, message, amount, total, alias=None):
+    def __init__(self, index, xfer, posted, message, amount, total):
         self.index = index
         self.xfer = xfer
         self.posted = posted
         self.message = message
         self.amount = amount
         self.total = total
-        self.alias = alias
 
     def __str__(self):
         s  = "%s " % self.xfer
         s += "%s " % self.posted
         s += "%9s " % self.amount
         s += "%9s " % self.total
-        s += "%-10s " % self.alias
         s += "'%s'" % self.message
         return s.encode("utf-8")
 
@@ -107,6 +105,36 @@ class Transactions:
     def __repr__(self):
         return "<Transactions:%d items from %s to %s>" % (
             len(self), self.start(), self.stop())
+
+    def to_sqlite3(self, location=":memory:"):
+        """Returns an SQLITE3 connection to a database containing the
+        transactions."""
+
+        import sqlite3
+
+        def decimal_to_sqlite3(n):
+            return int(100*n)
+
+        def sqlite3_to_decimal(s):
+            return Decimal(s)/100
+
+        sqlite3.register_adapter(Decimal, decimal_to_sqlite3)
+        sqlite3.register_converter("decimal", sqlite3_to_decimal)
+
+        con = sqlite3.connect(location, detect_types=sqlite3.PARSE_COLNAMES |
+                sqlite3.PARSE_DECLTYPES)
+        cur = con.cursor()
+        cur.execute("""create table transactions(
+                           id primary key,
+                           xfer date,
+                           posted date,
+                           message text,
+                           amount decimal,
+                           total decimal)""")
+        for t in self:
+            cur.execute("INSERT INTO transactions values(?,?,?,?,?,?)",
+                (t.index, t.xfer, t.posted, t.message, t.amount, t.total))
+        return con
 
     @property
     def first(self):
@@ -144,7 +172,7 @@ class Transactions:
     def append(self, value):
         self.trans.append(value)
 
-    def group_by(self, key, field=lambda x: x.alias):
+    def group_by(self, key, field=lambda x: x.xfer):
         return Transactions([t for t in self.trans if field(t) == key])
 
     def total(self):
@@ -187,3 +215,8 @@ def parse(filename):
     """Parses bank CSV file and returns Transactions instance."""
     with open(filename, "rt") as f:
         return Parse.csv_to_transactions(f)
+
+def parse_stream(stream):
+    """Parses bank CSV stream (like a file handle or StringIO) and returns
+    Transactions instance."""
+    return Parse.csv_to_transactions(stream)

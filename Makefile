@@ -1,2 +1,5 @@
 test:
-	python test.py export.csv
+	python test.py -v
+
+clean:
+	rm -f *.pyc
