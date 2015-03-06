@@ -35,7 +35,7 @@ The CSV File Format
 -------------------
 
 The CSV file should be a plain text file with the
-(ISO-8859-1)[https://en.wikipedia.org/wiki/ISO/IEC_8859-1] encoding (aka
+[ISO-8859-1](https://en.wikipedia.org/wiki/ISO/IEC_8859-1) encoding (aka
 Latin1).  It looks like this:
 
     "31-12-2014";"31-12-2014";"Test 1";"-497,78";"5.520,09"
@@ -50,8 +50,8 @@ The fields are as follows:
   * Date when the transaction was posted ("bokført").
   * A message associated with the transaction, set by the one making the
     transaction.
-  * The amount deposited or deducted from the account in (NOK, Norwegian
-    kroner)[https://en.wikipedia.org/wiki/Norwegian_krone] in format
+  * The amount deposited or deducted from the account in [NOK (Norwegian
+    kroner)](https://en.wikipedia.org/wiki/Norwegian_krone) in format
     `"-123,45"`, always two decimals and an optional sign.
   * The balance of your account after this transaction was completed.
 
