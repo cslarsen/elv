@@ -1,9 +1,12 @@
 # -*- encoding: utf-8 -*-
 
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io.StringIO import StringIO
+
 import datetime
 import elv
-import sys
 import unittest
 
 

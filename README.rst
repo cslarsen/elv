@@ -32,6 +32,46 @@ banken din som en CSV-fil. Foreløpig er det kun Jæren Sparebank som jeg
 *vet* er støttet, men du kan nok ganske enkelt legge til lesere for
 andre format.
 
+Installation
+------------
+
+You can install from ``setup.py``::
+
+    $ python setup.py install # you may have to run as sudo
+
+or from PyPI::
+
+    $ pip install elv
+
+Example usage
+-------------
+
+If you have the bank account transactions in a file called ``data.csv``, you
+can simply do::
+
+    $ python
+    >>> import elv
+    >>> transactions = elv.parse("data.csv")
+    >>> transactions
+    <Transactions:400 items from 2009-01-27 to 2014-09-29>
+    >>> transactions[0]
+    <Transaction:2014-09-29 2014-09-29 -2677.00  29519.13 'Vacation'>
+    >>> transactions[0].xfer
+    datetime.date(2014, 9, 29)
+    >>> transactions[0].posted
+    datetime.date(2014, 9, 29)
+    >>> transactions[0].amount
+    Decimal('-2677.00')
+
+You can also get an in-memory SQLite3 database by doing::
+
+    >>> db = transactions.to_sqlite3()
+    >>> db
+    <sqlite3.Connection object at 0x10f31e200>
+    >>> db.execute("SELECT * FROM Transactions").next()
+    (0, datetime.date(2014, 9, 29), datetime.date(2014, 9, 29),
+     u'Vacation', Decimal('-2677'), Decimal('29519.13'))
+
 The CSV File Format
 -------------------
 

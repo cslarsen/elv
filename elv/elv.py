@@ -10,11 +10,14 @@ Usage:
 """
 
 from __future__ import with_statement
-from datetime import datetime, date, timedelta
+from datetime import datetime
 from decimal import Decimal
 import csv
-import re
-import sys
+
+try:
+    import sqlite3
+except ImportError:
+    pass
 
 
 class Parse:
@@ -109,8 +112,6 @@ class Transactions:
     def to_sqlite3(self, location=":memory:"):
         """Returns an SQLITE3 connection to a database containing the
         transactions."""
-
-        import sqlite3
 
         def decimal_to_sqlite3(n):
             return int(100*n)

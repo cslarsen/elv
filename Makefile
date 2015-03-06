@@ -1,5 +1,24 @@
+PYTHON := python
+PYFLAKES := pyflakes
+
+default: test
+
 test:
-	python test.py -v
+	$(PYTHON) setup.py test
+
+check: test
+
+setup-pypi-test:
+	$(PYTHON) setup.py register -r pypitest
+	$(PYTHON) setup.py sdist upload -r pypitest
+
+setup-pypi-publish:
+	$(PYTHON) setup.py register -r pypi
+	$(PYTHON) setup.py sdist upload --sign -r pypi
+
+lint:
+	$(PYFLAKES) elv/*.py tests/*.py
 
 clean:
-	rm -f *.pyc
+	find . -name '*.pyc' -exec rm -f {} \;
+	rm -rf elv.egg-info .eggs build dist
