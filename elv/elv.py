@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
 
 """
-Contains some classes for parsing bank statements exported as CSV.
+Elv is a module for parsing bank account transactions from a CSV file.
 
-Usage:
+Usage example::
 
     with open("data.csv", "rt") as f:
         trans = Parse.csv_to_transactions(f)
@@ -21,44 +21,102 @@ except ImportError:
 
 
 class Parse:
-    """Parses bank CSV file."""
+    """Parses a bank CSV file."""
 
     @staticmethod
     def date(date_string, date_format="%d-%m-%Y"):
-        """Returns a Datetime object from date in string."""
+        """Returns a Datetime object from date in string.
+
+        Args:
+            date_format: The datetime.datetime.strptime format of the date.
+
+        Returns:
+            A ``datetime.Date`` object.
+        """
         return datetime.strptime(date_string, date_format).date()
 
     @staticmethod
-    def money(s):
-        """Returns a Decimal object from money amount in string."""
-        # Typical format can be "-38.500,00"
+    def money(s, thousand_sep=".", decimal_sep=","):
+        """Converts money amount in string to a Decimal object.
 
-        # Remove dots
-        s = s.replace(".", "")
+        With the default arguments, the format is expected to be
+        ``-38.500,00``, where dots separate thousands and comma the decimals.
 
-        # Replace comma with dot
-        s = s.replace(",", ".")
+        Args:
+            thousand_sep: Separator for thousands.
+            decimal_sep: Separator for decimals.
 
+        Returns:
+            A ``Decimal`` object of the string encoded money amount.
+        """
+        s = s.replace(thousand_sep, "")
+        s = s.replace(decimal_sep, ".")
         return Decimal(s)
 
     @staticmethod
-    def latin1(s):
-        """Decodes Latin1 encoded string to UTF-8."""
-        return s.decode("latin1")
+    def to_utf8(s, source_encoding="latin1"):
+        """Decodes string to UTF-8."""
+        return s.decode(source_encoding)
 
     @staticmethod
-    def csv_row_to_transaction(index, row):
+    def csv_row_to_transaction(index, row, source_encoding="latin1",
+            date_format="%d-%m-%Y", thousand_sep=".", decimal_sep=","):
+        """
+        Parses a row of strings to a ``Transaction`` object.
+
+        Args:
+            index: The index of this row in the original CSV file. Used for
+            sorting ``Transaction``s by their order of appearance.
+
+            row: The row containing strings for [transfer_date, posted_date,
+            message, money_amount, money_total].
+
+            source_encoding: The encoding that will be used to decode strings
+            to UTF-8.
+
+            date_format: The format of dates in this row.
+
+            thousand_sep: The thousand separator in money amounts.
+
+            decimal_sep: The decimal separator in money amounts.
+
+        Returns:
+            A ``Transaction`` object.
+
+        """
         xfer, posted, message, amount, total = row
         xfer = Parse.date(xfer)
         posted = Parse.date(posted)
-        message = Parse.latin1(message)
+        message = Parse.to_utf8(message, source_encoding)
         amount = Parse.money(amount)
         total = Parse.money(total)
         return Transaction(index, xfer, posted, message, amount, total)
 
     @staticmethod
-    def csv_to_transactions(handle):
-        """Parses CSV data and returns Transactions."""
+    def csv_to_transactions(handle, source_encoding="latin1",
+            date_format="%d-%m-%Y", thousand_sep=".", decimal_sep=","):
+        """
+        Parses CSV data from stream and returns ``Transactions``.
+
+        Args:
+            index: The index of this row in the original CSV file. Used for
+            sorting ``Transaction``s by their order of appearance.
+
+            row: The row containing strings for [transfer_date, posted_date,
+            message, money_amount, money_total].
+
+            source_encoding: The encoding that will be used to decode strings
+            to UTF-8.
+
+            date_format: The format of dates in this row.
+
+            thousand_sep: The thousand separator in money amounts.
+
+            decimal_sep: The decimal separator in money amounts.
+
+        Returns:
+            A ``Transactions`` object.
+        """
         trans = Transactions()
         rows = csv.reader(handle, delimiter=";", quotechar="\"")
 
@@ -139,20 +197,20 @@ class Transactions:
 
     @property
     def first(self):
-        """Returns earliest Transaction."""
+        """Returns earliest ``Transaction`` by transfer date ``xfer``."""
         return min(self.trans, key=lambda x: x.xfer)
 
     @property
     def last(self):
-        """Returns latest Transaction."""
+        """Returns latest ``Transaction`` by transfer date ``xfer``."""
         return max(self.trans, key=lambda x: x.xfer)
 
     def start(self):
-        """Returns start date."""
+        """Returns the earliest transfer (``xfer``) date."""
         return self.first.xfer
 
     def stop(self):
-        """Returns stop date."""
+        """Returns the latest transfer (``xfer``) date."""
         return self.last.xfer
 
     def __len__(self):
@@ -171,17 +229,24 @@ class Transactions:
         return key in self.trans
 
     def append(self, value):
+        """Adds a ``Transaction``."""
         self.trans.append(value)
 
     def group_by(self, key, field=lambda x: x.xfer):
+        """Returns all transactions whose given ``field`` matches ``key``.
+
+        Returns:
+            A ``Transactions`` object.
+        """
         return Transactions([t for t in self.trans if field(t) == key])
 
     def total(self):
-        """Returns sum of amounts."""
+        """Returns the sum of all ``Transaction.amount``s."""
         return sum(t.amount for t in self.trans)
 
     def balance(self):
-        """Returns amount submitted, amount withdrawn."""
+        """Returns a tuple of (total amount deposited, total amount
+        withdrawn)."""
         sin = Decimal("0.00")
         sout = Decimal("0.00")
 
@@ -195,29 +260,54 @@ class Transactions:
 
     @property
     def latest(self):
-        """Return latest row."""
+        """Return latest row, based on transfer date (``xfer``)."""
         return max(self.trans, key=lambda x: x.xfer)
 
-    def range(self, start=None, stop=None, field=lambda x: x.xfer):
-        """Return a Transactions object in an inclusive date range."""
+    def range(self, start_date=None, stop_date=None, field=lambda x: x.xfer):
+        """Return a ``Transactions`` object in an inclusive date range.
+
+        Args:
+            start_date: A ``datetime.Date`` object that marks the inclusive
+            start date for the range.
+
+            stop_date: A ``datetime.Date`` object that marks the inclusive end
+            date for the range.
+
+            field: The field to compare start and end dates to. Default is the
+            ``xfer`` field.
+
+        Returns:
+            A ``Transactions`` object.
+        """
+        assert start_date <= stop_date, \
+            "Start date must be earlier than end date."
+
         out = Transactions()
 
         for t in self.trans:
             date = field(t)
-            if (start is not None) and not (date >= start):
+            if (start_date is not None) and not (date >= start_date):
                 continue
-            if (stop is not None) and not (date <= stop):
+            if (stop_date is not None) and not (date <= stop_date):
                 continue
             out.append(t)
 
         return out
 
-def parse(filename):
-    """Parses bank CSV file and returns Transactions instance."""
-    with open(filename, "rt") as f:
-        return Parse.csv_to_transactions(f)
+def parse(filename, Class=Parse):
+    """Parses bank CSV file and returns Transactions instance.
 
-def parse_stream(stream):
+    Returns:
+        A ``Transactions`` object.
+    """
+    with open(filename, "rt") as f:
+        return Class.csv_to_transactions(f)
+
+def parse_stream(stream, Class=Parse):
     """Parses bank CSV stream (like a file handle or StringIO) and returns
-    Transactions instance."""
-    return Parse.csv_to_transactions(stream)
+    Transactions instance.
+
+    Returns:
+        A ``Transactions`` object.
+    """
+    return Class.csv_to_transactions(stream)
