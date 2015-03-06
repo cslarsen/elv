@@ -1,2 +1,6 @@
 *.csv
 *.pyc
+.eggs
+build
+dist
+elv.egg-info
