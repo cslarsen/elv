@@ -1,6 +1,7 @@
 *.csv
 *.pyc
 .eggs
+.tox
 build
 dist
 elv.egg-info
