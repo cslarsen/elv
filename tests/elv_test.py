@@ -1,10 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io.StringIO import StringIO
-
+import io
 import datetime
 import elv
 import unittest
@@ -12,7 +8,7 @@ import unittest
 
 class TestElv(unittest.TestCase):
     def setUp(self):
-        _csv = StringIO(u'''"31-12-2014";"31-12-2014";"Test 1";"-497,78";"5.520,09"
+        _csv = io.StringIO(u'''"31-12-2014";"31-12-2014";"Test 1";"-497,78";"5.520,09"
 "30-12-2014";"31-12-2014";"Test 2";"-100,00";"6.017,87"
 "30-12-2014";"31-12-2014";"Test 3 --æøåÆØÅ--";"-145,47";"6.117,87"
 "30-12-2014";"30-12-2014";"Test 4";"-457,24";"6.263,34"
