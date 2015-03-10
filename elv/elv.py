@@ -9,7 +9,6 @@ Usage example::
         trans = Parse.csv_to_transactions(f)
 """
 
-from __future__ import with_statement
 from datetime import datetime
 from decimal import Decimal
 import csv
