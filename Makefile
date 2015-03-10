@@ -8,6 +8,12 @@ test:
 
 check: test
 
+publish:
+	rm -rf dist/*
+	$(PYTHON) setup.py sdist bdist_wheel
+	gpg --detach-sign -a dist/*
+	twine upload dist/*
+
 setup-pypi-test:
 	$(PYTHON) setup.py register -r pypitest
 	$(PYTHON) setup.py sdist upload -r pypitest
