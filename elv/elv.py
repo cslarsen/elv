@@ -13,12 +13,14 @@ from __future__ import with_statement
 from datetime import datetime
 from decimal import Decimal
 import csv
+import sys
 
 try:
     import sqlite3
 except ImportError:
     pass
 
+PY3 = sys.version > "3"
 
 class Parse:
     """Parses a bank CSV file."""
@@ -55,8 +57,10 @@ class Parse:
 
     @staticmethod
     def to_utf8(s, source_encoding="latin1"):
-        """Decodes string to UTF-8."""
-        return s.decode(source_encoding)
+        if not PY3:
+            return s.decode(source_encoding)
+        else:
+            return s
 
     @staticmethod
     def csv_row_to_transaction(index, row, source_encoding="latin1",
