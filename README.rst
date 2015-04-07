@@ -1,6 +1,10 @@
 Elv
 ===
 
+.. image:: https://pypip.in/wheel/<PYPI_PKG_NAME>/badge.svg
+    :target: https://pypi.python.org/pypi/elv/
+    :alt: Wheel Status
+
 Elv is a small utility for parsing exported CSV files from the online
 Norwegian bank Jæren Sparebank.
 
