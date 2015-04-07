@@ -1,7 +1,7 @@
 Elv
 ===
 
-.. image:: https://pypip.in/wheel/<PYPI_PKG_NAME>/badge.svg
+.. image:: https://pypip.in/wheel/elv/badge.svg
     :target: https://pypi.python.org/pypi/elv/
     :alt: Wheel Status
 
