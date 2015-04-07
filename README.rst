@@ -5,28 +5,37 @@ Elv
     :target: https://pypi.python.org/pypi/elv/
     :alt: Wheel Status
 
-Elv is a small utility for parsing exported CSV files from the online
-Norwegian bank Jæren Sparebank.
+Elv is a small module for parsing bank transactions from CSV files and
+performing queries on the data.
 
-I use it for personal purposes, but decided to simply upload the code
-anyway, in case anyone wants to do the same.
-
-If you want to contribute other formats, please send pull requests on
-the project's GitHub page at
-
-Use the "export data" feature in the online bank, and you should be able
-to parse the file using Elv.
+It currently only supports one bank, Jæren Sparebank, but I'll add support for
+other banks whenever I get an example dump of their format.  Send pull requests
+if you have them at `https://github.com/cslarsen/elv/
+https://github.com/cslarsen/elv`__.
 
 Features
 --------
 
--  Parses CSV file from bank containing transactions
--  Money is stored in exact decimals (as you should do; never use floats
-   for stuff like this)
--  Contains a simple Python query API for sorting through large
-   collections of transactions.
--  Can optionally put transactions in an in-memory SQLite3 database for
-   even better queries.
+  * Parses CSV file from bank containing transactions
+
+  * Money is stored in exact decimals
+
+  * Contains a simple Python query API for sorting through large collections of
+    transactions.
+
+  * Can optionally put transactions in an in-memory SQLite3 database for even
+    better queries.
+
+
+Elevator pitch
+--------------
+::
+    >>> import elv
+    >>> trans = elv.parse("export.csv")
+    >>> trans
+    <Transactions:400 items from 2009-01-27 to 2014-09-29>
+    >>> trans[0].amount
+    Decimal('-2677.00')
 
 Norwegian short description
 ---------------------------
@@ -34,7 +43,14 @@ Norwegian short description
 Elv er en Python modul for å lese banktransaksjoner eksportert fra
 banken din som en CSV-fil. Foreløpig er det kun Jæren Sparebank som jeg
 *vet* er støttet, men du kan nok ganske enkelt legge til lesere for
-andre format.
+andre format.  Send meg gjerne eksempler på andre format!
+
+Instructions for Jæren Sparebank
+--------------------------------
+
+Use the "export data" feature in the online bank, and you should be able
+to parse the file using Elv.  I've seen other online banks having similar
+features, so please send me examples of other formats and I'll add them.
 
 Installation
 ------------
