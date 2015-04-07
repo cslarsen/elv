@@ -11,7 +11,7 @@ check: test
 publish:
 	rm -rf dist/*
 	$(PYTHON) setup.py sdist bdist_wheel
-	gpg --detach-sign -a dist/*
+	find dist -type f -exec gpg --detach-sign -a {} \;
 	twine upload dist/*
 
 setup-pypi-test:
