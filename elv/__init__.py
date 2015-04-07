@@ -10,7 +10,7 @@ __author__ = "Christian Stigen Larsen"
 __copyright__ = "Copyright (C) 2015 Christian Stigen Larsen"
 __email__ = "csl@csl.name"
 __license__ = "AGPL v3 or later"
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 
 __all__ = [
     "Parse",
