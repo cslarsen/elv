@@ -16,10 +16,14 @@ Norwegian short description
 ---------------------------
 
 Elv er en Python modul for å lese banktransaksjoner eksportert fra
-banken din som en CSV-fil. Foreløpig er det kun Jæren Sparebank som jeg
-*vet* er støttet, men du kan nok ganske enkelt legge til lesere for
-andre format.  Send meg gjerne eksempler på andre format!
+banken din som en CSV-fil.
 
+Foreløpig er det kun støtte for å lese filer fra Jæren Sparebank. For å
+eksportere transaksjoner for en konto, velg et datointervall og deretter i
+øverste høyre ikon velger du "eksporter til fil".
+
+Jeg har sett at andre nettbanker har tilsvarende funksjonalitet, så send meg
+gjerne eksempler på andre format så skal jeg legge dem til.
 
 Features
 --------
@@ -51,13 +55,6 @@ Here's how easy it is to use elv::
   <Transactions:15 items from 2015-01-02 to 2015-02-20>
   >>> trans.range(date(2015,1,1), date(2015,3,1)).total()
   Decimal('4500.00')
-
-Instructions for Jæren Sparebank
---------------------------------
-
-Use the "export data" feature in the online bank, and you should be able
-to parse the file using Elv.  I've seen other online banks having similar
-features, so please send me examples of other formats and I'll add them.
 
 Installation
 ------------
