@@ -128,6 +128,51 @@ class Parse:
 
         return trans
 
+class ParseSSB(Parse):
+    """Parses Sandnes Sparebank files, in format:
+
+        Dato\tForklaring\tUt av konto\tInn på konto
+        dd.mm.yyyy\t<text>\tnnn,dd\tnnn,dd\n
+        ...
+    """
+    @staticmethod
+    def date(date_string):
+        return Parse.date(date_string, date_format="%d.%m.%Y")
+
+    @staticmethod
+    def money(s):
+        return Parse.money(s, thousand_sep="", decimal_sep=",")
+
+    @staticmethod
+    def csv_row_to_transaction(index, row, source_encoding="utf8"):
+        date, message, out, in_ = row
+
+        xfer = date
+        posted = date
+
+        amount = "-%s" % out if out else in_
+        total = "0" # Not supported
+
+        xfer = ParseSSB.date(xfer)
+        posted = ParseSSB.date(posted)
+        message = Parse.to_utf8(message, source_encoding)
+        amount = ParseSSB.money(amount)
+        total = ParseSSB.money(total)
+        return Transaction(index, xfer, posted, message, amount, total)
+
+    @staticmethod
+    def csv_to_transactions(handle, source_encoding="utf8"):
+        trans = Transactions()
+        rows = csv.reader(handle, delimiter="\t")
+
+        for index, row in enumerate(rows):
+            # Skip leading header
+            if index == 0:
+                continue
+            trans.append(ParseSSB.csv_row_to_transaction(index, row))
+
+        return trans
+
 
 class Transaction:
     """Represents one transaction in a bank statement."""
@@ -297,20 +342,28 @@ class Transactions:
 
         return out
 
-def parse(filename, Class=Parse):
+formats = {
+    u"jæren sparebank": Parse,
+    u"sandnes sparebank": ParseSSB,
+}
+
+def parse(filename, format=u"Jæren Sparebank"):
     """Parses bank CSV file and returns Transactions instance.
 
     Returns:
         A ``Transactions`` object.
     """
+    Class = formats[format.lower()]
+
     with open(filename, "rt") as f:
         return Class.csv_to_transactions(f)
 
-def parse_stream(stream, Class=Parse):
+def parse_stream(stream, format=u"Jæren Sparebank"):
     """Parses bank CSV stream (like a file handle or StringIO) and returns
     Transactions instance.
 
     Returns:
         A ``Transactions`` object.
     """
+    Class = formats[format.lower()]
     return Class.csv_to_transactions(stream)

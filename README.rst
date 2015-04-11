@@ -8,9 +8,17 @@ Elv
 Elv is a small module for parsing bank transactions from CSV files and
 performing queries on the data.
 
-It currently only supports one bank, Jæren Sparebank, but I'll add support for
-other banks whenever I get an example dump of their format.  Send pull requests
-if you have them at https://github.com/cslarsen/elv/.
+Supported formats
+-----------------
+
+It currently only supports two banks:
+
+- Jæren Sparebank
+- Sandnes Sparebank
+
+but I'll add support for other banks whenever I get an example dump of their
+format.  Send pull requests if you have them at
+https://github.com/cslarsen/elv/.
 
 Norwegian short description
 ---------------------------
@@ -18,9 +26,9 @@ Norwegian short description
 Elv er en Python modul for å lese banktransaksjoner eksportert fra
 banken din som en CSV-fil.
 
-Foreløpig er det kun støtte for å lese filer fra Jæren Sparebank. For å
-eksportere transaksjoner for en konto, velg et datointervall og deretter i
-øverste høyre ikon velger du "eksporter til fil".
+Foreløpig er det kun støtte for å lese filer fra Jæren Sparebank og Sandnes
+Sparebank. For å eksportere transaksjoner for en konto, velg et datointervall
+og deretter i øverste høyre ikon velger du "eksporter til fil".
 
 Jeg har sett at andre nettbanker har tilsvarende funksjonalitet, så send meg
 gjerne eksempler på andre format så skal jeg legge dem til.
@@ -96,8 +104,21 @@ You can also get an in-memory SQLite3 database by doing::
   (0, datetime.date(2014, 9, 29), datetime.date(2014, 9, 29),
    u'Vacation', Decimal('-2677'), Decimal('29519.13'))
 
-The CSV File Format
--------------------
+How to parse other formats
+--------------------------
+
+To parse the default format, Jæren Sparebank::
+
+  >>> ts = elv.parse("file.csv", format="Jæren Sparebank")
+
+To parse Sandnes Sparebank::
+
+  >>> ts = elv.parse("file.txt", format="Sandnes Sparebank")
+
+To see a list of formats, see the dictionary ``elv.formats``.
+
+The CSV File Format: Jæren Sparebank
+------------------------------------
 
 The CSV file should be a plain text file with the
 `ISO-8859-1 <https://en.wikipedia.org/wiki/ISO/IEC_8859-1>`__ encoding
