@@ -215,6 +215,48 @@ class Transactions:
         return "<Transactions:%d items from %s to %s>" % (
             len(self), self.start(), self.stop())
 
+    def __add__(self, other):
+        t = Transactions(self.trans[:])
+        t += other
+        return t
+
+    def __iadd__(self, other):
+        if not isinstance(other, Transactions):
+            raise NotImplemented("Can only add Transactions")
+
+        # Recalculate indices
+        offset = 1 + self.last_index.index
+        trans = other.trans[:]
+        for i, t in enumerate(sorted(trans, key=lambda x: x.index)):
+            t.index = i + offset
+
+        self.trans += trans
+        return self
+
+    def __eq__(self, other):
+        return self.trans == other.trans
+
+    def __ne__(self, other):
+        return self.trans != other.trans
+
+    def __lt__(self, other):
+        return self.trans < other.trans
+
+    def __gt__(self, other):
+        return self.trans > other.trans
+
+    def __ge__(self, other):
+        return self.trans >= other.trans
+
+    def __le__(self, other):
+        return self.trans <= other.trans
+
+    def append(self, transaction):
+        """Appends a transaction."""
+        transaction = copy(transaction)
+        transaction.index = 1 + self.last_index.index
+        self.trans.append(transaction)
+
     def to_sqlite3(self, location=":memory:"):
         """Returns an SQLITE3 connection to a database containing the
         transactions."""
@@ -253,6 +295,16 @@ class Transactions:
         """Returns latest ``Transaction`` by transfer date ``xfer``."""
         return max(self.trans, key=lambda x: x.xfer)
 
+    @property
+    def last_index(self):
+        """Returns the ``Transaction`` with the largest index value."""
+        return max(self.trans, key=lambda x: x.index)
+
+    @property
+    def first_index(self):
+        """Returns the ``Transaction`` with the smallest index value."""
+        return min(self.trans, key=lambda x: x.index)
+
     def start(self):
         """Returns the earliest transfer (``xfer``) date."""
         return self.first.xfer
@@ -266,6 +318,9 @@ class Transactions:
 
     def __getitem__(self, key):
         return self.trans[key]
+
+    def __delitem__(self, key):
+        del self.trans[key]
 
     def __setitem__(self, key, value):
         self.trans[key] = value
