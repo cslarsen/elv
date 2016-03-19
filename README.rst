@@ -11,7 +11,8 @@ performing queries on the data.
 Supported formats
 -----------------
 
-It currently only supports two banks:
+It currently supports the banks who use the Eike Alliance solution.
+These include, but are not limited to
 
 - Jæren Sparebank
 - Sandnes Sparebank
@@ -19,6 +20,9 @@ It currently only supports two banks:
 but I'll add support for other banks whenever I get an example dump of their
 format.  Send pull requests if you have them at
 https://github.com/cslarsen/elv/.
+
+Sandnes Sparebank used to have another format, and I've kept it here, although
+I'm not sure anyone uses that anymore.
 
 Norwegian short description
 ---------------------------
