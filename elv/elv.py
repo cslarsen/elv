@@ -254,12 +254,6 @@ class Transactions:
     def __le__(self, other):
         return self.trans <= other.trans
 
-    def append(self, transaction):
-        """Appends a transaction."""
-        transaction = copy(transaction)
-        transaction.index = 1 + self.last_index.index
-        self.trans.append(transaction)
-
     def to_sqlite3(self, location=":memory:"):
         """Returns an SQLITE3 connection to a database containing the
         transactions."""
