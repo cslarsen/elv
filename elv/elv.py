@@ -191,7 +191,10 @@ class Transaction:
         s += "%9s " % self.amount
         s += "%9s " % self.total
         s += "'%s'" % self.message
-        return s.encode("utf-8")
+        if PY3:
+            return s
+        else:
+            return s.encode("utf-8")
 
     def __repr__(self):
         return "<Transaction:%s>" % self.__str__()
@@ -402,15 +405,25 @@ formats = {
     u"sandnes sparebank": ParseSSB,
 }
 
-def parse(filename, format=u"Jæren Sparebank"):
+def parse(filename, format=u"Jæren Sparebank", encoding="latin1"):
     """Parses bank CSV file and returns Transactions instance.
+
+    Args:
+        filename: Path to CSV file to read.
+        format: CSV format; one of the entries in `elv.formats`.
+        encoding: The CSV file encoding.
 
     Returns:
         A ``Transactions`` object.
     """
     Class = formats[format.lower()]
 
-    with open(filename, "rt") as f:
+    if PY3:
+        kw = {"encoding": encoding}
+    else:
+        kw = {}
+
+    with open(filename, "rt", **kw) as f:
         return Class.csv_to_transactions(f)
 
 def parse_stream(stream, format=u"Jæren Sparebank"):

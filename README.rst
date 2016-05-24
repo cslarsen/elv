@@ -157,7 +157,7 @@ transactions, one per line.
 License
 =======
 
-Copyright (C) 2015 Christian Stigen Larsen
+Copyright 2015, 2016 Christian Stigen Larsen
 
 Licensed under Affero GPL v3 or later; see
 http://www.gnu.org/licenses/agpl-3.0.html

@@ -4,6 +4,7 @@ import datetime
 import decimal
 import elv
 import io
+import os
 import sys
 import unittest
 
@@ -68,6 +69,17 @@ class TestElv(unittest.TestCase):
             first, last = res.fetchone()
             self.assertEqual(first, datetime.date(2014,12,29))
             self.assertEqual(last, datetime.date(2014,12,31))
+
+
+class TestElvOnFile(unittest.TestCase):
+    def test_iso8859_1_file(self):
+        filename = os.path.join(os.path.dirname(__file__),
+                "iso-8859-1-dos-crlf.csv")
+        self.assertTrue(os.path.exists(filename))
+
+        trans = elv.parse(filename, encoding="latin1")
+        self.assertTrue(trans is not None)
+        self.assertEqual(len(trans), 2)
 
 
 if __name__ == "__main__":
