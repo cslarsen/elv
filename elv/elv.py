@@ -19,9 +19,14 @@ try:
 except ImportError:
     pass
 
+try:
+    import pandas
+except ImportError:
+    pass
+
 PY3 = sys.version > "3"
 
-class Parse:
+class Parse(object):
     """Parses a bank CSV file."""
 
     @staticmethod
@@ -174,8 +179,11 @@ class ParseSSB(Parse):
         return trans
 
 
-class Transaction:
+class Transaction(object):
     """Represents one transaction in a bank statement."""
+
+    # NOTE: This must have the same order as in values()
+    _keys = ["index", "xfer", "posted", "message", "amount", "total"]
 
     def __init__(self, index, xfer, posted, message, amount, total):
         self.index = index
@@ -184,6 +192,23 @@ class Transaction:
         self.message = message
         self.amount = amount
         self.total = total
+
+    def __iter__(self):
+        return iter(self.values())
+
+    def keys(self):
+        return Transaction.keys
+
+    def values(self):
+        return [self.index,
+                self.xfer,
+                self.posted,
+                self.message,
+                self.amount,
+                self.total]
+
+    def items(self):
+        return zip(self.keys(), self.values())
 
     def __str__(self):
         s  = "%s " % self.xfer
@@ -200,7 +225,7 @@ class Transaction:
         return "<Transaction:%s>" % self.__str__()
 
 
-class Transactions:
+class Transactions(object):
     """Contains several Transaction instances and provides querying."""
 
     def __init__(self, transactions = None):
@@ -253,6 +278,10 @@ class Transactions:
 
     def __le__(self, other):
         return self.trans <= other.trans
+
+    def to_pandas(self):
+        """Returns the transactions as a pandas DataFrame."""
+        return pandas.DataFrame.from_records(self, columns=Transaction._keys)
 
     def to_sqlite3(self, location=":memory:"):
         """Returns an SQLITE3 connection to a database containing the
@@ -327,6 +356,9 @@ class Transactions:
 
     def __contains__(self, key):
         return key in self.trans
+
+    def __iter__(self):
+        return iter(self.trans)
 
     def append(self, value):
         """Adds a ``Transaction``."""
