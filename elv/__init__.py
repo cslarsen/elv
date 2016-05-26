@@ -12,7 +12,7 @@ __author__ = "Christian Stigen Larsen"
 __copyright__ = "Copyright 2015, 2016 Christian Stigen Larsen"
 __email__ = "csl@csl.name"
 __license__ = "Affero GPL v3 or later"
-__version__ = "1.0.13"
+__version__ = "1.0.14"
 
 __all__ = [
     "Parse",
